@@ -360,8 +360,18 @@
         })
         .then(response => response.json())
         .then(data => {
+            if (data.image_url) {
+                // 이미지를 화면에 다시 띄우기
+                const resultDiv = document.getElementById('result');
+                const imgElement = document.createElement('img');
+                imgElement.src = data.image_url; // 서버에서 반환된 이미지 URL을 사용
+                imgElement.alt = 'Generated Ad Image';
+                imgElement.style.maxWidth = '100%'; // 적절한 크기로 표시
+                resultDiv.innerHTML = ''; // 기존 내용을 지우고 새 이미지 추가
+                resultDiv.appendChild(imgElement);
+            }
             alert(`${data.message}`);
-        })
+        })  
         .catch((error) => {
             console.error('Error:', error);
         });
