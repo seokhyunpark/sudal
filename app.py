@@ -47,12 +47,15 @@ def generate_ad():
 
     print(f"비율: {ratio},  스타일 {style}, 주제: {subject}, 요구 사항: {requirement}")
 
-    gemini_cmd = ("아래 내용을 참고해서 홍보 문구를 작성해주세요."
-                  "이모티콘은 사용하지말고 20자 내외의 짧은 문구를 1개 작성해주세요.")
-    gemini_fmt = ("다른 설명은 필요없고 홍보 문구만 작성해주세요.")
+    gemini_cmd = ("""
+    아래 내용을 참고해서 이모티콘을 사용하지 않고 텍스트 문자로만 홍보 문구를 작성해주세요.
+    20자 내외의 짧은 문구를 1개 작성해주세요.
+    """
+    )
+    gemini_fmt = ("다른 설명은 필요없고 홍보 문구만 작성해주세요. 이모티콘은 절대로 사용하지마세요.")
 
-    message = gemini_cmd + f"비율: {ratio},  스타일 {style}, 주제: {subject}, 요구 사항: {requirement}" + gemini_fmt
-    phrase =generate_response(message)
+    message = gemini_cmd + f"비율: {ratio}, 스타일 {style}, 주제: {subject}, 요구 사항: {requirement}" + gemini_fmt
+    phrase = generate_response(message).rstrip()
 
     if image and image.filename != '':
         filename=image.filename
