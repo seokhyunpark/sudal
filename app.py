@@ -1,7 +1,6 @@
 import sys
 import os
 import glob
-import ast
 
 from add_text import add_image_text
 from flask import Flask, request, jsonify, render_template, url_for, send_from_directory
@@ -49,12 +48,11 @@ def generate_ad():
     print(f"비율: {ratio},  스타일 {style}, 주제: {subject}, 요구 사항: {requirement}")
 
     gemini_cmd = ("아래 내용을 참고해서 홍보 문구를 작성해주세요."
-                  "이모티콘은 사용하지말고 20자 내외의 짧은 문구를 총 5개 작성해주세요.")
-    gemini_fmt = ("파이썬의 리스트 형태만 작성해주세요. 예시: ['문구1', '문구2', '문구3', '문구4', '문구5']"
-                  "리스트 이외의 값, '''python 등 다른 글자는 작성하지 말아주세요.")
+                  "이모티콘은 사용하지말고 20자 내외의 짧은 문구를 1개 작성해주세요.")
+    gemini_fmt = ("다른 설명은 필요없고 홍보 문구만 작성해주세요.")
 
     message = gemini_cmd + f"비율: {ratio},  스타일 {style}, 주제: {subject}, 요구 사항: {requirement}" + gemini_fmt
-    sendmessage=generate_response(message)
+    phrase =generate_response(message)
 
     if image and image.filename != '':
         filename=image.filename
@@ -67,23 +65,16 @@ def generate_ad():
         with open(image_path, 'rb') as img_file:
             image_file = img_file.read()
 
-        response_in_list = ast.literal_eval(sendmessage)
-        
-        file_names = ["001", "002", "003", "004", "005"]
-        
-        i = 0
-        for text in response_in_list:
-            image = Image.open(BytesIO(image_file))
-            image = add_image_text(image, text)
-            image.save(f"./uploads/{file_names[i]}.png")
-            i += 1
+        image = Image.open(BytesIO(image_file))
+        image = add_image_text(image, phrase)
+        image.save(f"./uploads/001.png")
 
     else:
         print("이미지 파일이 전송되지 않았습니다.")
 
     response = {
-        'message': sendmessage,
-        'image_url' : url_for('uploaded_file', filename=file_names[0]+".png")
+        'message': phrase,
+        'image_url' : url_for('uploaded_file', filename="001.png")
         }
     print(response)
 
