@@ -4,7 +4,7 @@ import glob
 import ast
 
 from add_text import add_image_text
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, url_for, send_from_directory
 from gemini import generate_response
 from io import BytesIO
 from PIL import Image
@@ -54,23 +54,23 @@ def generate_ad():
                   "리스트 이외의 값, '''python 등 다른 글자는 작성하지 말아주세요.")
 
     message = gemini_cmd + f"비율: {ratio},  스타일 {style}, 주제: {subject}, 요구 사항: {requirement}" + gemini_fmt
-    response = {'message': generate_response(message)}
-    print(response)
+    sendmessage=generate_response(message)
 
     if image and image.filename != '':
         filename=image.filename
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         image.save(image_path)
 
-        image_url=url_for('uploaded_file', filename=filename)
+        
         print(f"이미지 파일 전송 성공")
 
-        image_file = image.read()
+        with open(image_path, 'rb') as img_file:
+            image_file = img_file.read()
 
-        response_in_list = ast.literal_eval(response['message'])
+        response_in_list = ast.literal_eval(sendmessage)
         
         file_names = ["001", "002", "003", "004", "005"]
-          
+        
         i = 0
         for text in response_in_list:
             image = Image.open(BytesIO(image_file))
@@ -80,6 +80,12 @@ def generate_ad():
 
     else:
         print("이미지 파일이 전송되지 않았습니다.")
+
+    response = {
+        'message': sendmessage,
+        'image_url' : url_for('uploaded_file', filename=file_names[0]+".png")
+        }
+    print(response)
 
 
     return jsonify(response)
