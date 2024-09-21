@@ -1,5 +1,7 @@
-import ast
 import sys
+import os
+import glob
+import ast
 
 from add_text import add_image_text
 from flask import Flask, request, jsonify, render_template
@@ -7,10 +9,16 @@ from gemini import generate_response
 from io import BytesIO
 from PIL import Image
 
+app = Flask(__name__)
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-app = Flask(__name__)
+UPLOAD_FOLDER = './uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# 업로드 폴더가 없다면 생성
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 @app.route('/')
 def index():
@@ -18,6 +26,19 @@ def index():
 
 @app.route('/generate-ad', methods=['POST'])
 def generate_ad():
+
+    # uploads 폴더의 모든 파일 삭제
+    folder_path = './uploads'
+    
+    # 폴더 내의 모든 파일을 찾고 삭제
+    files = glob.glob(os.path.join(folder_path, '*'))
+    for file in files:
+        try:
+            os.remove(file)
+            print(f"파일 삭제: {file}")
+        except Exception as e:
+            print(f"파일 삭제 오류: {e}")
+
     data = request.form
     ratio = data.get('ratio')
     style = data.get('style')
@@ -38,14 +59,18 @@ def generate_ad():
 
     if image and image.filename != '':
         filename=image.filename
-        #image.save(f"./uploads/")#uploads폴더 엇으면 오류
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(image_path)
+
+        image_url=url_for('uploaded_file', filename=filename)
         print(f"이미지 파일 전송 성공")
 
         image_file = image.read()
 
         response_in_list = ast.literal_eval(response['message'])
-
+        
         file_names = ["001", "002", "003", "004", "005"]
+          
         i = 0
         for text in response_in_list:
             image = Image.open(BytesIO(image_file))
@@ -56,7 +81,12 @@ def generate_ad():
     else:
         print("이미지 파일이 전송되지 않았습니다.")
 
+
     return jsonify(response)
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
