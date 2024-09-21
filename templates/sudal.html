@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudal</title>
+    <style>
+        body {
+            background-color: #f5f5f7;
+            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #1d1d1f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            width: 1000px;
+            background-color: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .left-section {
+            flex: 1.5;
+            background-color: #fafafa;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #e0e0e5;
+        }
+        .image-placeholder {
+            width: 100%;
+            height: 450px;
+            background-color: #dfe1e5;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .image-upload-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #d1d1d6;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+        .image-upload-container:hover {
+            border-color: #0071e3;
+        }
+        .upload-description {
+            flex: 1;
+            font-size: 14px;
+            color: #6e6e73;
+        }
+        .upload-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload-btn {
+            padding: 10px 20px;
+            background-color: #0071e3;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .upload-btn:hover {
+            background-color: #005bb5;
+        }
+        .right-section {
+            flex: 2;
+            padding: 40px;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            color: #1d1d1f;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #d1d1d6;
+            border-radius: 12px;
+            background-color: #f9f9fb;
+            font-size: 16px;
+            color: #1d1d1f;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, textarea:focus {
+            border-color: #0071e3;
+            outline: none;
+        }
+        textarea {
+            resize: none;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+        .btn-group button {
+            flex: 1;
+            padding: 0;
+            border: 1px solid #d1d1d6;
+            background-color: #f9f9fb;
+            color: #1d1d1f;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+        }
+        .btn-group button:hover {
+            background-color: #0071e3;
+            color: white;
+            border-color: #0071e3;
+        }
+        .btn-1-1 {
+            aspect-ratio: 1 / 1;
+            width: 100px;
+            height: auto;
+        }
+        .btn-4-5 {
+            aspect-ratio: 4 / 5;
+            width: 80px;
+            height: auto;
+        }
+        .btn-3-4 {
+            aspect-ratio: 3 / 4;
+            width: 75px;
+            height: auto;
+        }
+        button.active {
+            background-color: #0071e3;
+            color: white;
+            border-color: #0071e3;
+        }
+        .image-preview {
+            display: inline-block;
+            margin: 10px;
+            position: relative;
+        }
+        .image-preview img {
+            width: 100px;
+            height: auto;
+            border-radius: 10px;
+        }
+        .image-preview button {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .generate-btn {
+            padding: 10px 20px;
+            background-color: #d1d1d6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: not-allowed;
+            transition: background-color 0.3s ease;
+            float: right;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .generate-btn.active {
+            background-color: #0071e3;
+            cursor: pointer;
+        }
+        .generate-btn.active:hover {
+            background-color: #005bb5;
+        }
+        .arrow-right {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 왼쪽 섹션 (이미지 및 사진 추가) -->
+    <div class="left-section">
+        <div class="image-placeholder" id="result">결과물</div>
+        <div class="image-upload-container">
+            <div class="upload-description">
+                .jpg, .jpeg, .png, .webp 사진 100개까지 업로드 가능 <br>
+                (사진 1개당 10MB 이하, 동시 업로드는 30개까지)
+            </div>
+            <div class="upload-button" onclick="document.getElementById('imageUpload').click()">
+                <button class="upload-btn">사진 추가</button>
+                <input id="imageUpload" type="file" multiple accept="image/*" onchange="handleImageUpload(event)" style="display:none;">
+            </div>
+        </div>
+        <div id="imagePreviewContainer"></div>
+    </div>
+
+    <!-- 오른쪽 섹션 (입력 폼) -->
+    <div class="right-section">
+        <!-- 비율 선택하기 -->
+        <div class="section">
+            <label>비율 선택하기</label>
+            <div class="btn-group">
+                <button class="btn-1-1" onclick="selectRatio(this, '1:1')">1:1</button>
+                <button class="btn-4-5" onclick="selectRatio(this, '4:5')">4:5</button>
+                <button class="btn-3-4" onclick="selectRatio(this, '3:4')">3:4</button>
+            </div>
+        </div>
+
+        <!-- 광고 스타일 -->
+        <div class="section">
+            <label>광고 스타일</label>
+            <input type="text" id="adStyle" placeholder="원하는 스타일을 입력해주세요. (예시: 귀여운, 깜찍한, ...)">
+        </div>
+
+        <!-- 광고 주제 -->
+        <div class="section">
+            <label>광고 주제</label>
+            <textarea id="adSubject" placeholder="주제를 입력해주세요. (예시: 식당, 옷가게, ...)" rows="3"></textarea>
+        </div>
+
+        <!-- 요구사항 -->
+        <div class="section">
+            <label>요구사항</label>
+            <textarea id="adRequirement" placeholder="꼭 포함되어야 할 요구사항을 작성해주세요. (가게 이름, 전화번호, 대표메뉴 등)" rows="3"></textarea>
+        </div>
+
+        <!-- 생성하기 버튼 -->
+        <div class="section">
+            <button class="generate-btn" id="generateBtn" onclick="generateAd()" disabled>
+                생성하기 <span class="arrow-right">→</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedRatio = null;
+    let uploadedImages = [];
+
+    function selectRatio(button, ratio) {
+        const buttons = document.querySelectorAll('.btn-group button');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        selectedRatio = ratio;
+        checkFormCompletion();
+    }
+
+    function handleImageUpload(event) {
+        const files = event.target.files;
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+        for (let file of files) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.createElement('div');
+                preview.classList.add('image-preview');
+                preview.innerHTML = `
+                    <img src="${e.target.result}" alt="Image Preview">
+                    <button onclick="removeImage(this)">×</button>
+                `;
+                imagePreviewContainer.appendChild(preview);
+
+                uploadedImages.push(file);
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        // 업로드를 마치면 input을 초기화하여 다시 사진을 선택할 수 있게 함
+        event.target.value = '';
+        checkFormCompletion();
+    }
+
+    function removeImage(button) {
+        const preview = button.parentElement;
+        const index = Array.from(preview.parentElement.children).indexOf(preview);
+        uploadedImages.splice(index, 1);  // 배열에서 삭제
+        preview.remove();
+        checkFormCompletion();
+    }
+
+    function checkFormCompletion() {
+        const adStyle = document.getElementById('adStyle').value.trim();
+        const adSubject = document.getElementById('adSubject').value.trim();
+        const adRequirement = document.getElementById('adRequirement').value.trim();
+
+        // 모든 필드가 입력되었는지 확인
+        const formComplete = selectedRatio && adStyle && adSubject && adRequirement && uploadedImages.length >= 1;
+
+        const generateBtn = document.getElementById('generateBtn');
+        if (formComplete) {
+            generateBtn.classList.add('active');
+            generateBtn.disabled = false;
+        } else {
+            generateBtn.classList.remove('active');
+            generateBtn.disabled = true;
+        }
+    }
+
+    function generateAd() {
+        const adStyle = document.getElementById('adStyle').value;
+        const adSubject = document.getElementById('adSubject').value;
+        const adRequirement = document.getElementById('adRequirement').value;
+
+        // 선택된 비율 확인
+        if (!selectedRatio) {
+            alert('비율을 선택해주세요.');
+            return;
+        }
+
+        alert(`광고 생성:\n비율: ${selectedRatio}\n스타일: ${adStyle}\n주제: ${adSubject}\n요구사항: ${adRequirement}`);
+    }
+</script>
+
+</body>
+</html>
