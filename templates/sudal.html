@@ -128,7 +128,7 @@
             color: #1d1d1f;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s ease, border-color 0.3s ease;      
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         .btn-group button:hover {
             background-color: #0071e3;
@@ -285,6 +285,7 @@
                 생성하기 <span class="arrow-right">→</span>
             </button>
         </div>
+
     </div>
 </div>
 
@@ -305,7 +306,7 @@
         const file = event.target.files[0];
         if (file && !uploadedImage) {
             uploadedImage = file;
-            
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const imagePreview = document.createElement('div');
@@ -381,6 +382,7 @@
                imgElement.src = data.image_url; // 서버에서 반환된 이미지 URL을 사용
                imgElement.alt = 'Generated Ad Image';
                imgElement.style.maxWidth = '100%'; // 적절한 크기로 표시
+               imgElement.style.maxHeight = '100%';
                resultDiv.innerHTML = ''; // 기존 내용을 지우고 새 이미지 추가
                resultDiv.appendChild(imgElement);
 
@@ -389,8 +391,8 @@
                downloadBtn.style.display = 'inline-block';
                downloadBtn.href = data.image_url; // 다운로드 링크 설정
            }
-           alert(`${data.message}`);
-       })  
+           alert('광고 이미지가 생성되었습니다.');
+       })
        .catch((error) => {
            console.error('Error:', error);
        });
