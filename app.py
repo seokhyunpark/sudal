@@ -21,7 +21,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 @app.route('/')
 def index():
-    return render_template('sudal.html')
+    return render_template('index.html')
 
 @app.route('/generate-ad', methods=['POST'])
 def generate_ad():
