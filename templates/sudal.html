@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sudal</title>
+    <title>Admini</title>
+    <link rel="icon" type="/Users/kangminjung/2024 KNU/Sudal" href="sudal.png">
     <style>
         body {
             background-color: #f5f5f7;
@@ -84,7 +85,7 @@
             background-color: #005bb5;
         }
         .right-section {
-            flex: 2;
+            flex: 1.37;
             padding: 40px;
         }
         .section {
@@ -98,7 +99,7 @@
             color: #1d1d1f;
         }
         input[type="text"], textarea {
-            width: 100%;
+            width: 90%;
             padding: 15px;
             border: 1px solid #d1d1d6;
             border-radius: 12px;
@@ -119,18 +120,15 @@
             gap: 15px;
         }
         .btn-group button {
-            flex: 1;
-            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 1px solid #d1d1d6;
             background-color: #f9f9fb;
             color: #1d1d1f;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease;      
         }
         .btn-group button:hover {
             background-color: #0071e3;
@@ -138,21 +136,20 @@
             border-color: #0071e3;
         }
         /*버튼 비율 조정*/
+        /* 비율 버튼 스타일 */
         .btn-1-1 {
-            aspect-ratio: 1 / 1;
             width: 100px;
-            height: auto;
+            height: 100px;
         }
         .btn-4-5 {
-            aspect-ratio: 4 / 5;
             width: 80px;
-            height: auto;
+            height: 100px;
         }
-        .btn-3-4 {
-            aspect-ratio: 3 / 4;
-            width: 75px;
-            height: auto;
+        .btn-16-9 {
+            width: 177.78px;
+            height: 100px;
         }
+
 
         button.active {
             background-color: #0071e3;
@@ -220,6 +217,7 @@
 </head>
 <body>
 
+
 <div class="container">
     <!-- 왼쪽 섹션 (이미지 및 사진 추가) -->
     <div class="left-section">
@@ -244,26 +242,26 @@
             <div class="btn-group">
                 <button class="btn-1-1" onclick="selectRatio(this, '1:1')">1:1</button>
                 <button class="btn-4-5" onclick="selectRatio(this, '4:5')">4:5</button>
-                <button class="btn-3-4" onclick="selectRatio(this, '3:4')">3:4</button>
+                <button class="btn-16-9" onclick="selectRatio(this, '16:9')">16:9</button>
             </div>
         </div>
 
         <!-- 광고 스타일 -->
         <div class="section">
             <label>광고 스타일</label>
-            <input type="text" id="adStyle" placeholder="원하는 스타일을 입력해주세요." oninput="checkFormCompletion()">
+            <input type="text" id="adStyle" placeholder="원하는 스타일을 입력해주세요.(예:웃긴, 귀여운 등)" oninput="checkFormCompletion()">
         </div>
 
         <!-- 광고 주제 -->
         <div class="section">
             <label>광고 주제</label>
-            <textarea id="adSubject" placeholder="광고할 내용을 작성해주세요." rows="3" oninput="checkFormCompletion()"></textarea>
+            <textarea id="adSubject" placeholder="광고할 내용을 작성해주세요.(예:식당, 옷가게 등 업종)" rows="3" oninput="checkFormCompletion()"></textarea>
         </div>
 
         <!-- 광고 요구사항 -->
         <div class="section">
             <label>요구사항</label>
-            <textarea id="adRequirement" placeholder="요구사항이 있다면 입력해주세요." rows="3" oninput="checkFormCompletion()"></textarea>
+            <textarea id="adRequirement" placeholder="요구사항을 입력해주세요.(상호명, 연락처 등)" rows="3" oninput="checkFormCompletion()"></textarea>
         </div>
 
         <!-- 생성 버튼 -->
@@ -289,11 +287,13 @@
 
     function handleImageUpload(event) {
         const file = event.target.files[0];
+        
         if (file && !uploadedImage) {
-            uploadedImage = file;
-            
             const reader = new FileReader();
             reader.onload = function(e) {
+                uploadedImage = e.target.result;
+                const img = document.createElement('img');
+                img.src = e.target.result;
                 const imagePreview = document.createElement('div');
                 imagePreview.classList.add('image-preview');
                 imagePreview.innerHTML = `<img src="${e.target.result}" alt="preview"><button onclick="deleteImage(this)">X</button>`;
@@ -338,34 +338,44 @@
         }
 
         // 데이터 전송 처리
-        // FormData 생성
-        const formData = new FormData();
-        formData.append('ratio', selectedRatio);
-        formData.append('style', adStyle);
-        formData.append('subject', adSubject);
-        formData.append('requirement', adRequirement);
+       // FormData 생성
+       const formData = new FormData();
+       formData.append('ratio', selectedRatio);
+       formData.append('style', adStyle);
+       formData.append('subject', adSubject);
+       formData.append('requirement', adRequirement);
 
-        // 이미지 파일 추가
-        if (uploadedImage) {
-            formData.append('image', uploadedImage);
-        } else {
-            alert('이미지를 추가해주세요.');
-            return;
-        }
+       // 이미지 파일 추가
+       if (uploadedImage) {
+           formData.append('image', uploadedImage);
+       } else {
+           alert('이미지를 추가해주세요.');
+           return;
+       }
 
-        // 데이터 전송 처리 (JSON이 아닌 FormData로 전송)
-        fetch('/generate-ad', {
-            method: 'POST',
-            body: formData, // FormData 객체를 body로 전송
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(`${data.message}`);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    }
+       // 데이터 전송 처리 (JSON이 아닌 FormData로 전송)
+       fetch('/generate-ad', {
+           method: 'POST',
+           body: formData, // FormData 객체를 body로 전송
+       })
+       .then(response => response.json())
+       .then(data => {
+           if (data.image_url) {
+               // 이미지를 화면에 다시 띄우기
+               const resultDiv = document.getElementById('result');
+               const imgElement = document.createElement('img');
+               imgElement.src = data.image_url; // 서버에서 반환된 이미지 URL을 사용
+               imgElement.alt = 'Generated Ad Image';
+               imgElement.style.maxWidth = '100%'; // 적절한 크기로 표시
+               resultDiv.innerHTML = ''; // 기존 내용을 지우고 새 이미지 추가
+               resultDiv.appendChild(imgElement);
+           }
+           alert(`${data.message}`);
+       })  
+       .catch((error) => {
+           console.error('Error:', error);
+       });
+   }
 </script>
 
 </body>
