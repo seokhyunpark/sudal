@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template, url_for,send_from_di
 from gemini import generate_response
 import sys
 import os
+import glob
 
 app = Flask(__name__)
 
@@ -20,6 +21,19 @@ def index():
 
 @app.route('/generate-ad', methods=['POST'])
 def generate_ad():
+
+    # uploads 폴더의 모든 파일 삭제
+    folder_path = './uploads'
+    
+    # 폴더 내의 모든 파일을 찾고 삭제
+    files = glob.glob(os.path.join(folder_path, '*'))
+    for file in files:
+        try:
+            os.remove(file)
+            print(f"파일 삭제: {file}")
+        except Exception as e:
+            print(f"파일 삭제 오류: {e}")
+
     data = request.form
     ratio = data.get('ratio')
     style = data.get('style')
