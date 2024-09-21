@@ -289,13 +289,11 @@
 
     function handleImageUpload(event) {
         const file = event.target.files[0];
-        
         if (file && !uploadedImage) {
+            uploadedImage = file;
+            
             const reader = new FileReader();
             reader.onload = function(e) {
-                uploadedImage = e.target.result;
-                const img = document.createElement('img');
-                img.src = e.target.result;
                 const imagePreview = document.createElement('div');
                 imagePreview.classList.add('image-preview');
                 imagePreview.innerHTML = `<img src="${e.target.result}" alt="preview"><button onclick="deleteImage(this)">X</button>`;
@@ -340,17 +338,25 @@
         }
 
         // 데이터 전송 처리
+        // FormData 생성
+        const formData = new FormData();
+        formData.append('ratio', selectedRatio);
+        formData.append('style', adStyle);
+        formData.append('subject', adSubject);
+        formData.append('requirement', adRequirement);
+
+        // 이미지 파일 추가
+        if (uploadedImage) {
+            formData.append('image', uploadedImage);
+        } else {
+            alert('이미지를 추가해주세요.');
+            return;
+        }
+
+        // 데이터 전송 처리 (JSON이 아닌 FormData로 전송)
         fetch('/generate-ad', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                ratio: selectedRatio,
-                style: adStyle,
-                subject: adSubject,
-                requirement: adRequirement
-            }),
+            body: formData, // FormData 객체를 body로 전송
         })
         .then(response => response.json())
         .then(data => {
