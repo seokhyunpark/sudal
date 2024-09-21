@@ -226,12 +226,11 @@
         <div class="image-placeholder" id="result">결과물</div>
         <div class="image-upload-container">
             <div class="upload-description">
-                .jpg, .jpeg, .png, .webp 사진 업로드 가능 <br> <!--사진 100개까지 업로드 가능?-->
-                <!--(사진 1개당 10MB 이하, 동시 업로드는 30개까지)-->
+                .jpg, .jpeg, .png, .webp 사진 업로드 가능 <br>
             </div>
             <div class="upload-button" onclick="document.getElementById('imageUpload').click()">
                 <button class="upload-btn">사진 추가</button>
-                <input id="imageUpload" type="file" multiple accept="image/*" onchange="handleImageUpload(event)" style="display:none;">
+                <input id="imageUpload" type="file" accept="image/*" onchange="handleImageUpload(event)" style="display:none;">
             </div>
         </div>
         <div id="imagePreviewContainer"></div>
@@ -279,6 +278,7 @@
 <script>
     let selectedRatio = '';
     let imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    let uploadedImage = null; // 하나의 이미지만 저장
 
     function selectRatio(button, ratio) {
         document.querySelectorAll('.btn-group button').forEach(btn => btn.classList.remove('active'));
@@ -288,10 +288,12 @@
     }
 
     function handleImageUpload(event) {
-        const files = event.target.files;
-        Array.from(files).forEach(file => {
+        const file = event.target.files[0];
+        
+        if (file && !uploadedImage) {
             const reader = new FileReader();
             reader.onload = function(e) {
+                uploadedImage = e.target.result;
                 const img = document.createElement('img');
                 img.src = e.target.result;
                 const imagePreview = document.createElement('div');
@@ -300,13 +302,16 @@
                 imagePreviewContainer.appendChild(imagePreview);
             };
             reader.readAsDataURL(file);
-        });
+        }
         checkFormCompletion();
     }
 
     function deleteImage(button) {
         const imagePreview = button.parentElement;
         imagePreviewContainer.removeChild(imagePreview);
+        uploadedImage = null;
+        document.getElementById('imageUpload').value = ""; // 업로드된 파일 초기화
+        checkFormCompletion();
     }
 
     function checkFormCompletion() {
@@ -315,7 +320,7 @@
         const adRequirement = document.getElementById('adRequirement').value.trim();
         const generateBtn = document.getElementById('generateBtn');
 
-        if (selectedRatio && adStyle && adSubject && adRequirement && imagePreviewContainer.children.length > 0) {
+        if (selectedRatio && adStyle && adSubject && adRequirement && uploadedImage) {
             generateBtn.classList.add('active');
             generateBtn.disabled = false;
         } else {
@@ -329,15 +334,12 @@
         const adSubject = document.getElementById('adSubject').value;
         const adRequirement = document.getElementById('adRequirement').value;
 
-        // 선택된 비율 확인
         if (!selectedRatio) {
             alert('비율을 선택해주세요.');
             return;
         }
 
-        //alert(`광고 생성:\n비율: ${selectedRatio}\n스타일: ${adStyle}\n주제: ${adSubject}\n요구사항: ${adRequirement}`);
-        // Flask로 데이터 전송
-        // Flask로 데이터 전송
+        // 데이터 전송 처리
         fetch('/generate-ad', {
             method: 'POST',
             headers: {
