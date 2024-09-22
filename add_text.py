@@ -10,7 +10,7 @@ def add_image_text(my_image, text):
     bbox = font.getbbox(text)
     text_width = bbox[2] - bbox[0]
     text_height = bbox[3] - bbox[1]
-    position = ((image_width - text_width) // 2, image_height - text_height - 50)
+    position = ((image_width - text_width) // 2, image_height - text_height - 100)
     outline_color = (0, 0, 0)
     outline_thickness = 7
 
