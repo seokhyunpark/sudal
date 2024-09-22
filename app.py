@@ -51,8 +51,7 @@ def generate_ad():
     gemini_fmt = ("""
     다른 설명은 필요없고 홍보 문구만 작성해주세요.
     이모티콘은 절대로 사용하지마세요.
-    글자 수는 10자 이내로 작성해주세요.
-    줄바꿈은 사용하지 마세요.
+    글자 수는 최대 13자 이내로 짧게 작성해주세요.
     """)
 
     message = gemini_cmd + f"비율: {ratio}, 스타일 {style}, 주제: {subject}, 요구 사항: {requirement}" + gemini_fmt
