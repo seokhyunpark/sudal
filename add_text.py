@@ -5,7 +5,7 @@ def add_image_text(my_image, text):
     image_width, image_height = image.size
 
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype(font='NotoSansKR-Bold.ttf', size=50)
+    font = ImageFont.truetype(font='NotoSansKR-Bold.ttf', size=40)
 
     bbox = font.getbbox(text)
     text_width = bbox[2] - bbox[0]
